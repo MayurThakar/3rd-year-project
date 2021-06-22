@@ -1,0 +1,36 @@
+body {
+  background-color: whitesmoke;
+}
+
+.signup-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 5em;
+}
+
+.signup-container {
+  text-align: center;
+  width: 40em;
+}
+
+.signup-form {
+  background-color: white;
+  border-radius: 1.5em;
+  padding: 2.5em;
+}
+
+.signup-button {
+  margin-top: 1em;
+}
+
+.exception {
+  color: red;
+  margin-top: 1em;
+}
+
+.message {
+  color: green;
+  margin-top: 1em;
+}
