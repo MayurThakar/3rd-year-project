@@ -1,0 +1,1 @@
+web: gunicorn thirdyrprj.wsgi --log-file -
