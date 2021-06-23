@@ -21,7 +21,8 @@
   <body>
     <main class="signup-main">
       <div class="signup-container">
-        <form>
+        <form action="{% url 'signup' %}" method="POST">
+          {% csrf_token %} {% if not otp_verif %}
           <div class="signup-form">
             <div class="input-group">
               <span class="input-group-text">Full name</span>
@@ -29,8 +30,8 @@
                 type="text"
                 placeholder="First name"
                 aria-label="First name"
-                name="first-name"
-                value=""
+                name="first_name"
+                value="{{ input_data.first_name }}"
                 class="form-control"
                 required
               />
@@ -38,8 +39,8 @@
                 type="text"
                 placeholder="Last name"
                 aria-label="Last name"
-                name="last-name"
-                value=""
+                name="last_name"
+                value="{{ input_data.last_name }}"
                 class="form-control"
                 required
               />
@@ -50,15 +51,18 @@
                 class="form-control"
                 placeholder="Username"
                 aria-label="Username"
-                name="user-name"
-                value=""
+                name="username"
+                value="{{ input_data.username }}"
                 required
               />
               <span class="input-group-text">@</span>
               <span class="input-group-text"
                 ><select class="form-select" name="module">
-                  <option selected value="student">Student</option>
-                  <option value="faculty">Faculty</option>
+                  <option selected value="{{ input_data.module }}">
+                    {{ input_data.module }}
+                  </option>
+                  <option value="student">student</option>
+                  <option value="faculty">faculty</option>
                 </select></span
               >
             </div>
@@ -66,11 +70,11 @@
               <input
                 type="email"
                 class="form-control"
-                placeholder="Email address"
-                aria-label="Email address"
+                placeholder="Gmail address"
+                aria-label="Gmail address"
                 aria-describedby="basic-addon2"
                 name="mail"
-                value=""
+                value="{{ input_data.mail }}"
                 required
               />
               <span class="input-group-text" id="basic-addon2">@gmail.com</span>
@@ -82,8 +86,8 @@
                 placeholder="Password"
                 aria-label="Password"
                 aria-describedby="basic-addon1"
-                name="password"
-                value=""
+                name="new_password"
+                value="{{ input_data.new_password }}"
                 required
               />
             </div>
@@ -94,8 +98,8 @@
                 placeholder="Confirm password"
                 aria-label="Confirm password"
                 aria-describedby="basic-addon1"
-                name="conf-paswd"
-                value=""
+                name="conf_new_paswd"
+                value="{{ input_data.conf_new_paswd }}"
                 required
               />
             </div>
@@ -109,15 +113,11 @@
               </button>
             </div>
           </div>
-          <!-- <div class="alert">
-            <div class="exception">
-              <h5>Error</h5>
-            </div>
-            <div class="message">
-              <h5>OTP has been sent to your email</h5>
-            </div>
-          </div> -->
-          <!-- <div class="input-group mb-3">
+          {% else %}
+          <div class="message">
+            <h5>{{ has_message }}</h5>
+          </div>
+          <div class="input-group mb-3">
             <span class="input-group-text">OTP</span>
             <input
               type="text"
@@ -131,7 +131,12 @@
                 Verified
               </button></span
             >
-          </div> -->
+          </div>
+          {% endif %} {% if has_error %}
+          <div class="exception">
+            <h5>{{ has_error }}</h5>
+          </div>
+          {% endif %}
         </form>
       </div>
     </main>
