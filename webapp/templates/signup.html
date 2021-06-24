@@ -57,9 +57,9 @@
               />
               <span class="input-group-text">@</span>
               <span class="input-group-text"
-                ><select class="form-select" name="module">
-                  <option selected value="{{ input_data.module }}">
-                    {{ input_data.module }}
+                ><select class="form-select" name="account">
+                  <option selected value="{{ input_data.account }}">
+                    {{ input_data.account }}
                   </option>
                   <option value="student">student</option>
                   <option value="faculty">faculty</option>
@@ -124,10 +124,11 @@
               class="form-control"
               aria-label="OTP"
               name="otp"
+              value="{{ obtd_otp }}"
               required
             />
             <span
-              ><button type="submit" class="btn btn-info" name="otp-button">
+              ><button type="submit" class="btn btn-info" name="verif-button">
                 Verified
               </button></span
             >
