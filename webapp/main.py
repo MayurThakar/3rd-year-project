@@ -15,11 +15,11 @@ def isdeliverable(mail_addr):
     if (response.status_code != 200):
         return f'[{response.status_code}]: please contact HOD'
 
-        data = json.loads(response.text)
-        if data['deliverability'] == 'UNDELIVERABLE':
-            return 'Email is undeliverable, please change!'
+    data = json.loads(response.text)
+    if data['deliverability'] == 'UNDELIVERABLE':
+        return 'Email is undeliverable, please change!'
 
-        return True
+    return True
 
 
 def isduplicate(new_data):

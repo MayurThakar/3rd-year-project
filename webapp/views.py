@@ -9,7 +9,6 @@ def signup(request):
         reference = main.Main(request)
 
         if (error := reference.isvalid()) == True:
-
             if (error := reference.send_otp(
                 request.POST['mail'], request.POST['first_name'],
                     request.POST['account'])) == True:
