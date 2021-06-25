@@ -19,11 +19,11 @@
     <title>Signup</title>
   </head>
   <body>
-    <main class="signup-main">
-      <div class="signup-container">
+    <main class="container-main">
+      <div class="container">
         <form action="{% url 'signup' %}" method="POST">
           {% csrf_token %} {% if not otp_verif %}
-          <div class="signup-form">
+          <div class="form">
             <div class="input-group">
               <span class="input-group-text">Full name</span>
               <input
@@ -51,15 +51,15 @@
                 class="form-control"
                 placeholder="Username"
                 aria-label="Username"
-                name="username"
-                value="{{ input_data.username }}"
+                name="new_username"
+                value="{{ input_data.new_username }}"
                 required
               />
               <span class="input-group-text">@</span>
               <span class="input-group-text"
-                ><select class="form-select" name="account">
-                  <option selected value="{{ input_data.account }}">
-                    {{ input_data.account }}
+                ><select class="form-select" name="new_account">
+                  <option selected value="{{ input_data.new_account }}">
+                    {{ input_data.new_account }}
                   </option>
                   <option value="student">student</option>
                   <option value="faculty">faculty</option>
@@ -103,7 +103,7 @@
                 required
               />
             </div>
-            <div class="signup-button">
+            <div class="form-button">
               <button
                 type="submit"
                 class="btn btn-outline-success"

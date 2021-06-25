@@ -7,24 +7,24 @@ from mailjet_rest import Client
 
 
 def isdeliverable(mail_addr):
-    api = apis.Abstract()
+    # api = apis.Abstract()
 
-    response = requests.get(
-        f'https://emailvalidation.abstractapi.com/v1/?api_key={api.key}&email={mail_addr}')
+    # response = requests.get(
+    #     f'https://emailvalidation.abstractapi.com/v1/?api_key={api.key}&email={mail_addr}')
 
-    if (response.status_code != 200):
-        return f'[{response.status_code}]: please contact HOD'
+    # if (response.status_code != 200):
+    #     return f'[{response.status_code}]: please contact HOD'
 
-    data = json.loads(response.text)
-    if data['deliverability'] == 'UNDELIVERABLE':
-        return 'Email is undeliverable, please change!'
+    # data = json.loads(response.text)
+    # if data['deliverability'] == 'UNDELIVERABLE':
+    #     return 'Email is undeliverable, please change!'
 
     return True
 
 
 def isduplicate(new_data):
     fetched_username = Faculty.objects.filter(
-        username=new_data['username']).first()
+        username=new_data['new_username']).first()
     if fetched_username:
         return 'This username is already taken'
 
@@ -34,7 +34,7 @@ def isduplicate(new_data):
         return 'This email is already taken'
 
     fetched_username = Student.objects.filter(
-        username=new_data['username']).first()
+        username=new_data['new_username']).first()
     if fetched_username:
         return 'This username is already taken'
 
@@ -46,10 +46,10 @@ def isduplicate(new_data):
     return isdeliverable(new_data['mail'])
 
 
-def valid_password(paswd):
+def valid_password(password):
     digit = upper = lower = False
 
-    for each_char in paswd:
+    for each_char in password:
         if each_char.isupper():
             upper = True
         elif each_char.islower():
@@ -92,14 +92,27 @@ class Main:
     def __init__(self, request):
         self.request = request
 
+    def isexist(self):
+        username = self.request.POST['username']
+        password = encrypt_password(self.request.POST['password'])
+
+        fetched_uname = Faculty.objects.filter(username=username).first()
+
+        if not fetched_uname:
+            return 'User does not exist'
+        elif fetched_uname.password != password:
+            return 'Incorrect password'
+
+        return True
+
     def isvalid(self):
         if len(self.request.POST['first_name']) < 3:
             return 'First name must contain 3 characters'
         elif len(self.request.POST['last_name']) < 3:
             return 'Last name must contain 3 characters'
-        elif len(self.request.POST['username']) < 5:
+        elif len(self.request.POST['new_username']) < 5:
             return 'Username must contain 5 characters'
-        elif len(self.request.POST['account']) == 0:
+        elif len(self.request.POST['new_account']) == 0:
             return 'Please select student or faculty account'
         elif (error := isduplicate(self.request.POST)) != True:
             return error
@@ -112,7 +125,10 @@ class Main:
 
         return True
 
-    def send_otp(self, mail_addr, name, account):
+    def send_otp(self):
+        mail_addr = self.request.POST['mail']
+        name = self.request.POST['first_name']
+        account = self.request.POST['new_account']
         api = apis.Mailjet()
         genr_otp = generate_otp()
         mail = Client(auth=(api.key, api.secret), version='v3.1')
@@ -135,14 +151,17 @@ class Main:
                 "CustomID": "AppGettingStartedTest"}]
         }
 
-        response = mail.send.create(data=data)
-        if (response.status_code != 200):
-            return f'[{response.status_code}]: please contact HOD'
+        # response = mail.send.create(data=data)
+        # if (response.status_code != 200):
+        #     return f'[{response.status_code}]: please contact HOD'
 
         add_otp(mail_addr, genr_otp)
         return True
 
-    def verification(self, obtd_otp, mail_addr):
+    def verification(self):
+        obtd_otp = self.request.POST['otp']
+        mail_addr = self.request.session['data']['mail']
+
         if not obtd_otp.isdigit():
             return 'Please provide only digits'
 
@@ -157,15 +176,14 @@ class Main:
         return 'Sorry, invalid OTP!'
 
     def create_account(self, data):
-        if data['account'] == 'faculty':
+        if data['new_account'] == 'faculty':
             reference = Faculty()
         else:
             reference = Student()
 
-        reference.full_name = f"{data['first_name']} {data['last_name']}"
-        reference.username = data['username']
+        full_name = f"{data['first_name'].title()} {data['last_name'].title()}"
+        reference.full_name = full_name
+        reference.username = data['new_username']
         reference.mail = data['mail']
         reference.password = encrypt_password(data['new_password'])
         reference.save()
-
-# username_mail = Faculty.objects.filter(username=new_data['username'], mail=new_data['mail']).first()
