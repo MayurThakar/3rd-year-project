@@ -18,7 +18,10 @@ def index(request):
                 return render(request, 'student.html')
 
         else:
-            return render(request, 'index.html', {'has_error': error, 'input_data': request.POST})
+            return render(request, 'index.html', {
+                'has_error': error[0],
+                'err_id': error[1],
+                'input_data': request.POST})
 
     return render(request, 'index.html')
 
@@ -37,7 +40,10 @@ def signup(request):
                     'has_message': 'OTP has been sent to your email'})
 
         else:
-            return render(request, 'signup.html', {'has_error': error, 'input_data': request.POST})
+            return render(request, 'signup.html', {
+                'has_error': error[0],
+                'err_id': error[1],
+                'input_data': request.POST})
 
     elif request.method == 'POST' and 'verif-button' in request.POST:
         reference = main.Main(request)
@@ -56,3 +62,7 @@ def signup(request):
                 'has_error': error})
 
     return render(request, 'signup.html')
+
+
+def hod_page(request):
+    return render(request, 'hod.html')

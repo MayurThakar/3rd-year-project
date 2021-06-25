@@ -17,10 +17,11 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from webapp.views import index, signup
+from webapp import views
 
 urlpatterns = [
-    path('', index, name='index'),
-    path('signup/', signup, name='signup'),
+    path('', views.index, name='index'),
+    path('signup/', views.signup, name='signup'),
+    # path('', views.hod_page, name='hod_page'),
     path('admin/', admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -36,9 +36,9 @@ body {
   color: gray;
 }
 
-.exception {
-  color: red;
+#exception {
   margin-top: 1em;
+  border-radius: 1em;
 }
 
 .message {

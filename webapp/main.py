@@ -13,11 +13,11 @@ def isdeliverable(mail_addr):
     #     f'https://emailvalidation.abstractapi.com/v1/?api_key={api.key}&email={mail_addr}')
 
     # if (response.status_code != 200):
-    #     return f'[{response.status_code}]: please contact HOD'
+    #     return f'[{response.status_code}]: please contact HOD', 0
 
     # data = json.loads(response.text)
     # if data['deliverability'] == 'UNDELIVERABLE':
-    #     return 'Email is undeliverable, please change!'
+    #     return 'Email is undeliverable, please change!', 4
 
     return True
 
@@ -31,12 +31,12 @@ def isduplicate(new_data):
         fetched_username = mdl.objects.filter(
             username=new_data['new_username']).first()
         if fetched_username:
-            return 'This username is already taken'
+            return 'This username is already taken', 3
 
         fetched_mail = mdl.objects.filter(
             mail=new_data['mail']).first()
         if fetched_mail:
-            return 'This email is already taken'
+            return 'This email is already taken', 4
 
     return isdeliverable(new_data['mail'])
 
@@ -54,7 +54,7 @@ def valid_password(password):
         if digit and upper and lower:
             return True
 
-    return 'Password must contain one digit, upper, lower character'
+    return 'Password must contain one digit, upper, lower character', 5
 
 
 def generate_otp():
@@ -105,29 +105,29 @@ class Main:
         fetched_uname = model.objects.filter(username=username).first()
 
         if not fetched_uname:
-            return 'User does not exist'
+            return 'User does not exist', 1
         elif fetched_uname.password != password:
-            return 'Incorrect password'
+            return 'Incorrect password', 2
 
         return True
 
     def isvalid(self):
         if len(self.request.POST['first_name']) < 3:
-            return 'First name must contain 3 characters'
+            return 'First name must contain 3 characters', 1
         elif len(self.request.POST['last_name']) < 3:
-            return 'Last name must contain 3 characters'
+            return 'Last name must contain 3 characters', 2
         elif len(self.request.POST['new_username']) < 5:
-            return 'Username must contain 5 characters'
+            return 'Username must contain 5 characters', 3
         elif len(self.request.POST['new_account']) == 0:
-            return 'Please select student or faculty account'
+            return 'Please select student or faculty account', 0
         elif (error := isduplicate(self.request.POST)) != True:
             return error
         elif len(self.request.POST['new_password']) < 8:
-            return 'Password must contain 8 and one digit, upper, lower character'
+            return 'Password must contain 8 and one digit, upper, lower character', 5
         elif (error := valid_password(self.request.POST['new_password'])) != True:
             return error
         elif self.request.POST['new_password'] != self.request.POST['conf_new_paswd']:
-            return 'Confirm password did not match'
+            return 'Confirm password did not match', 6
 
         return True
 
