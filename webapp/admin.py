@@ -1,7 +1,8 @@
 from django.contrib import admin
-from webapp.models import OTP, Faculty, Student
+from webapp import models
 # Register your models here.
 
-admin.site.register(OTP)
-admin.site.register(Faculty)
-admin.site.register(Student)
+admin.site.register(models.HOD)
+admin.site.register(models.Faculty)
+admin.site.register(models.Student)
+admin.site.register(models.OTP)

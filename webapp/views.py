@@ -9,7 +9,14 @@ def index(request):
         reference = main.Main(request)
 
         if (error := reference.isexist()) == True:
-            return render(request, 'Faculty.html')
+
+            if request.POST['account'] == 'hod':
+                return render(request, 'hod.html')
+            elif request.POST['account'] == 'faculty':
+                return render(request, 'faculty.html')
+            else:
+                return render(request, 'student.html')
+
         else:
             return render(request, 'index.html', {'has_error': error, 'input_data': request.POST})
 
@@ -48,5 +55,4 @@ def signup(request):
                 'obtd_otp': request.POST['otp'],
                 'has_error': error})
 
-    else:
-        return render(request, 'signup.html')
+    return render(request, 'signup.html')

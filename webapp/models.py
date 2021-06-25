@@ -3,15 +3,16 @@ from django.db import models
 # Create your models here.
 
 
-class OTP(models.Model):
-    otp = models.IntegerField()
+class HOD(models.Model):
+    username = models.CharField(max_length=25)
     mail = models.EmailField()
+    password = models.CharField(max_length=25)
 
     class Meta:
-        verbose_name_plural = 'OTPs'
+        verbose_name_plural = 'HOD'
 
     def __str__(self):
-        return str(self.otp)
+        return self.username
 
 
 class Faculty(models.Model):
@@ -45,3 +46,14 @@ class Student(models.Model):
 
     def __str__(self):
         return self.username
+
+
+class OTP(models.Model):
+    otp = models.IntegerField()
+    mail = models.EmailField()
+
+    class Meta:
+        verbose_name_plural = 'OTPs'
+
+    def __str__(self):
+        return str(self.otp)

@@ -1,7 +1,7 @@
 import json
 import requests
 from webapp import apis
-from webapp.models import OTP, Faculty, Student
+from webapp import models
 from random import randint
 from mailjet_rest import Client
 
@@ -23,25 +23,20 @@ def isdeliverable(mail_addr):
 
 
 def isduplicate(new_data):
-    fetched_username = Faculty.objects.filter(
-        username=new_data['new_username']).first()
-    if fetched_username:
-        return 'This username is already taken'
 
-    fetched_mail = Faculty.objects.filter(
-        mail=new_data['mail']).first()
-    if fetched_mail:
-        return 'This email is already taken'
+    model = [models.HOD, models.Faculty, models.Student]
 
-    fetched_username = Student.objects.filter(
-        username=new_data['new_username']).first()
-    if fetched_username:
-        return 'This username is already taken'
+    for mdl in model:
 
-    fetched_mail = Student.objects.filter(
-        mail=new_data['mail']).first()
-    if fetched_mail:
-        return 'This email is already taken'
+        fetched_username = mdl.objects.filter(
+            username=new_data['new_username']).first()
+        if fetched_username:
+            return 'This username is already taken'
+
+        fetched_mail = mdl.objects.filter(
+            mail=new_data['mail']).first()
+        if fetched_mail:
+            return 'This email is already taken'
 
     return isdeliverable(new_data['mail'])
 
@@ -67,7 +62,7 @@ def generate_otp():
 
 
 def add_otp(mail_addr, genr_otp):
-    reference = OTP()
+    reference = models.OTP()
     reference.mail = mail_addr
     reference.otp = genr_otp
     reference.save()
@@ -94,9 +89,20 @@ class Main:
 
     def isexist(self):
         username = self.request.POST['username']
-        password = encrypt_password(self.request.POST['password'])
 
-        fetched_uname = Faculty.objects.filter(username=username).first()
+        if self.request.POST['account'] == 'hod':
+            model = models.HOD
+            password = self.request.POST['password']
+
+        else:
+            password = encrypt_password(self.request.POST['password'])
+
+            if self.request.POST['account'] == 'faculty':
+                model = models.Faculty
+            else:
+                model = models.Student
+
+        fetched_uname = model.objects.filter(username=username).first()
 
         if not fetched_uname:
             return 'User does not exist'
@@ -165,21 +171,22 @@ class Main:
         if not obtd_otp.isdigit():
             return 'Please provide only digits'
 
-        otp_mail = OTP.objects.filter(otp=obtd_otp).values('mail').first()
+        otp_mail = models.OTP.objects.filter(
+            otp=obtd_otp).values('mail').first()
 
         if otp_mail:
             if mail_addr == otp_mail['mail']:
 
-                OTP.objects.filter(otp=obtd_otp).delete()
+                models.OTP.objects.filter(otp=obtd_otp).delete()
                 return True
 
         return 'Sorry, invalid OTP!'
 
     def create_account(self, data):
         if data['new_account'] == 'faculty':
-            reference = Faculty()
+            reference = models.Faculty()
         else:
-            reference = Student()
+            reference = models.Student()
 
         full_name = f"{data['first_name'].title()} {data['last_name'].title()}"
         reference.full_name = full_name
