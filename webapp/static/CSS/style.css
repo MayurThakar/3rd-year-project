@@ -1,3 +1,7 @@
+* {
+  font-family: Roboto;
+}
+
 body {
   background-color: whitesmoke;
 }
@@ -44,4 +48,13 @@ body {
 .message {
   color: green;
   margin-bottom: 1em;
+}
+
+.content {
+  padding: 1em;
+}
+
+#nav a {
+  font-size: 1.3em;
+  color: darkgray;
 }

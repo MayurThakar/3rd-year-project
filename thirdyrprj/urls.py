@@ -22,6 +22,6 @@ from webapp import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('signup/', views.signup, name='signup'),
-    # path('', views.hod_page, name='hod_page'),
+    path('hod', views.hod_page, name='hod_page'),
     path('admin/', admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
