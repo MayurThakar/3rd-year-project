@@ -119,9 +119,9 @@ def encrypt_password(password):
 def account_status(username):
     acct_sts = models.Faculty.objects.filter(username=username).first()
 
-    if acct_sts.acct_sts == 'pending':
+    if acct_sts.account_status == 'pending':
         return 'Your account is not active, please contact HOD', 0
-    elif acct_sts.acct_sts == 'deactive':
+    elif acct_sts.account_status == 'deactive':
         return 'Sorry, your account been deactivated', 0
 
     return True

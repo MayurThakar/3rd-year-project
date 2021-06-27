@@ -5,3 +5,4 @@ from webapp import models
 admin.site.register(models.Faculty)
 admin.site.register(models.Student)
 admin.site.register(models.OTP)
+admin.site.register(models.Announce)

@@ -13,7 +13,7 @@ class Faculty(models.Model):
         ('pending', 'pending'),
         ('deactive', 'deactive')
     )
-    acct_sts = models.CharField(
+    account_status = models.CharField(
         choices=status, default='pending', max_length=10)
 
     class Meta:
@@ -45,3 +45,15 @@ class OTP(models.Model):
 
     def __str__(self):
         return str(self.otp)
+
+
+class Announce(models.Model):
+    title = models.CharField(max_length=25)
+    description = models.TextField(max_length=255)
+    date = models.DateField()
+
+    class Meta:
+        verbose_name_plural = 'Announcements'
+
+    def __str__(self):
+        return self.title
