@@ -10,9 +10,7 @@ def index(request):
 
         if (error := reference.isexist()) == True:
 
-            if request.POST['account'] == 'hod':
-                return render(request, 'hod.html')
-            elif request.POST['account'] == 'faculty':
+            if request.POST['account'] == 'faculty':
                 return render(request, 'faculty.html')
             else:
                 return render(request, 'student.html')
@@ -31,13 +29,10 @@ def signup(request):
         reference = main.Main(request)
 
         if (error := reference.isvalid()) == True:
-
-            if (error := reference.send_otp()) == True:
-
-                request.session['data'] = request.POST
-                return render(request, 'signup.html', {
-                    'otp_verif': True,
-                    'has_message': 'OTP has been sent to your email'})
+            request.session['data'] = request.POST
+            return render(request, 'signup.html', {
+                'otp_verif': True,
+                'has_message': 'OTP has been sent to your email'})
 
         else:
             return render(request, 'signup.html', {
@@ -62,7 +57,3 @@ def signup(request):
                 'has_error': error})
 
     return render(request, 'signup.html')
-
-
-def hod_page(request):
-    return render(request, 'hod.html')

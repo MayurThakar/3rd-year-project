@@ -24,7 +24,7 @@ def isdeliverable(mail_addr):
 
 def isduplicate(new_data):
 
-    model = [models.HOD, models.Faculty, models.Student]
+    model = [models.Faculty, models.Student]
 
     for mdl in model:
 
@@ -68,6 +68,40 @@ def add_otp(mail_addr, genr_otp):
     reference.save()
 
 
+def send_otp(data):
+    mail_addr = data['mail']
+    name = data['first_name']
+    account = data['new_account']
+    api = apis.Mailjet()
+    genr_otp = generate_otp()
+    mail = Client(auth=(api.key, api.secret), version='v3.1')
+
+    data = {
+        'Messages': [{
+
+            "From": {
+                "Email": "codecol.services@gmail.com",
+                "Name": "Codecol"},
+
+            "To": [{
+                "Email": mail_addr,
+                "Name": name}],
+
+            "Subject": "Your verification code",
+            "TextPart": "OTP verification",
+            "HTMLPart":
+            f"<div style='font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;'><h3>Hi {name}!</h3>We just need to<span style='color: #99e265'> verify </span>your email address<br />before you can<span style='color: #ffbd4a'> access </span>{account} account.<br /><br />Your verification code is<span style='color: #ff5c5c'> {genr_otp}</span><br /><br />Enter this code in our website to<span style='color: #2eb2ff'> activate </span><br />your {account} account.<br /><br />Kind Regards, <br /><span style='color: #99e265'>C</span><span style='color: #ffbd4a'>O</span><span style='color: #ff5c5c'>D</span><span style='color: #2eb2ff'>E</span><span style='color: #99e265'>C</span><span style='color: #ffbd4a'>O</span><span style='color: #ff5c5c'>L</span></div>",
+            "CustomID": "AppGettingStartedTest"}]
+    }
+
+    # response = mail.send.create(data=data)
+    # if (response.status_code != 200):
+    #     return f'[{response.status_code}]: please contact HOD'
+
+    add_otp(mail_addr, genr_otp)
+    return True
+
+
 def encrypt_password(password):
     encr_paswd = ''
 
@@ -82,6 +116,17 @@ def encrypt_password(password):
     return ''.join(reversed(encr_paswd))
 
 
+def account_status(username):
+    acct_sts = models.Faculty.objects.filter(username=username).first()
+
+    if acct_sts.acct_sts == 'pending':
+        return 'Your account is not active, please contact HOD', 0
+    elif acct_sts.acct_sts == 'deactive':
+        return 'Sorry, your account been deactivated', 0
+
+    return True
+
+
 class Main:
 
     def __init__(self, request):
@@ -89,18 +134,12 @@ class Main:
 
     def isexist(self):
         username = self.request.POST['username']
+        password = encrypt_password(self.request.POST['password'])
 
-        if self.request.POST['account'] == 'hod':
-            model = models.HOD
-            password = self.request.POST['password']
-
+        if self.request.POST['account'] == 'faculty':
+            model = models.Faculty
         else:
-            password = encrypt_password(self.request.POST['password'])
-
-            if self.request.POST['account'] == 'faculty':
-                model = models.Faculty
-            else:
-                model = models.Student
+            model = models.Student
 
         fetched_uname = model.objects.filter(username=username).first()
 
@@ -109,7 +148,7 @@ class Main:
         elif fetched_uname.password != password:
             return 'Incorrect password', 2
 
-        return True
+        return account_status(username) if self.request.POST['account'] == 'faculty' else True
 
     def isvalid(self):
         if len(self.request.POST['first_name']) < 3:
@@ -129,40 +168,7 @@ class Main:
         elif self.request.POST['new_password'] != self.request.POST['conf_new_paswd']:
             return 'Confirm password did not match', 6
 
-        return True
-
-    def send_otp(self):
-        mail_addr = self.request.POST['mail']
-        name = self.request.POST['first_name']
-        account = self.request.POST['new_account']
-        api = apis.Mailjet()
-        genr_otp = generate_otp()
-        mail = Client(auth=(api.key, api.secret), version='v3.1')
-
-        data = {
-            'Messages': [{
-
-                "From": {
-                    "Email": "codecol.services@gmail.com",
-                    "Name": "Codecol"},
-
-                "To": [{
-                    "Email": mail_addr,
-                    "Name": name}],
-
-                "Subject": "Your verification code",
-                "TextPart": "OTP verification",
-                "HTMLPart":
-                f"<div style='font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;'><h3>Hi {name}!</h3>We just need to<span style='color: #99e265'> verify </span>your email address<br />before you can<span style='color: #ffbd4a'> access </span>{account} account.<br /><br />Your verification code is<span style='color: #ff5c5c'> {genr_otp}</span><br /><br />Enter this code in our website to<span style='color: #2eb2ff'> activate </span><br />your {account} account.<br /><br />Kind Regards, <br /><span style='color: #99e265'>C</span><span style='color: #ffbd4a'>O</span><span style='color: #ff5c5c'>D</span><span style='color: #2eb2ff'>E</span><span style='color: #99e265'>C</span><span style='color: #ffbd4a'>O</span><span style='color: #ff5c5c'>L</span></div>",
-                "CustomID": "AppGettingStartedTest"}]
-        }
-
-        # response = mail.send.create(data=data)
-        # if (response.status_code != 200):
-        #     return f'[{response.status_code}]: please contact HOD'
-
-        add_otp(mail_addr, genr_otp)
-        return True
+        return send_otp(self.request.POST)
 
     def verification(self):
         obtd_otp = self.request.POST['otp']

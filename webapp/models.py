@@ -3,18 +3,6 @@ from django.db import models
 # Create your models here.
 
 
-class HOD(models.Model):
-    username = models.CharField(max_length=25)
-    mail = models.EmailField()
-    password = models.CharField(max_length=25)
-
-    class Meta:
-        verbose_name_plural = 'HOD'
-
-    def __str__(self):
-        return self.username
-
-
 class Faculty(models.Model):
     full_name = models.CharField(max_length=25)
     username = models.CharField(max_length=25)
@@ -25,7 +13,7 @@ class Faculty(models.Model):
         ('pending', 'pending'),
         ('deactive', 'deactive')
     )
-    acc_sts = models.CharField(
+    acct_sts = models.CharField(
         choices=status, default='pending', max_length=10)
 
     class Meta:
