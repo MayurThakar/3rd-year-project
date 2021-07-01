@@ -1,9 +1,12 @@
 import json
 import requests
+import pandas as panda
 from webapp import apis
 from webapp import models
 from random import randint
+from webapp import credentials
 from mailjet_rest import Client
+from datetime import datetime, timedelta
 
 
 def isdeliverable(mail_addr):
@@ -127,6 +130,26 @@ def account_status(username):
     return True
 
 
+def get_credentials():
+    id_name = models.Gsheet.objects.all().first()
+    return id_name.sheetID, id_name.sheetNAME
+
+
+def get_current_day():
+    response = requests.get('http://worldclockapi.com/api/json/gmt/now')
+    data = json.loads(response.text)
+    return data['dayOfTheWeek']
+
+
+def get_current_time():
+    response = requests.get(
+        'http://worldtimeapi.org/api/timezone/Indian/Cocos')
+    data = json.loads(response.text)
+    date_time = datetime.fromisoformat(str(data['datetime']).split('.')[0])
+    date_time = date_time - timedelta(minutes=60)
+    return str(date_time).split(' ')[1]
+
+
 class Main:
 
     def __init__(self, request):
@@ -200,3 +223,34 @@ class Main:
         reference.mail = data['mail']
         reference.password = encrypt_password(data['new_password'])
         reference.save()
+
+    def fetch_periods(self):
+        SPREADSHEET_ID, SPREADSHEET_NAME = get_credentials()
+        DAY = get_current_day()
+
+        creds = credentials.Credentials(SPREADSHEET_ID, SPREADSHEET_NAME)
+        dataframe = panda.read_csv(creds.SPREADSHEET_URL)
+        clean_data = dataframe.loc[:, ~
+                                   dataframe.columns.str.contains('^Unnamed')]
+        data = panda.DataFrame(clean_data, columns=[DAY, 'Time'])
+        periods = {}
+
+        for _, row in data.iterrows():
+            if len(str(row[DAY]).split('|')) > 1:
+                periods[row['Time']] = {
+                    'teacher': str(row[DAY]).split('|')[0],
+                    'subject': str(row[DAY]).split('|')[1].title()}
+
+        return periods
+
+    def fetch_announces(self):
+        fetched_announces = list(
+            set(models.Announce.objects.all().values_list()))
+        announces = {}
+
+        for content in fetched_announces:
+            announces[content[2].title()] = {
+                'date': content[1],
+                'description': content[3]}
+
+        return announces

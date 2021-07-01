@@ -48,12 +48,23 @@ class OTP(models.Model):
 
 
 class Announce(models.Model):
+    date = models.DateField()
     title = models.CharField(max_length=25)
     description = models.TextField(max_length=255)
-    date = models.DateField()
 
     class Meta:
         verbose_name_plural = 'Announcements'
 
     def __str__(self):
         return self.title
+
+
+class Gsheet(models.Model):
+    sheetID = models.CharField(max_length=50)
+    sheetNAME = models.CharField(max_length=10)
+
+    class Meta:
+        verbose_name_plural = 'Gsheet'
+
+    def __str__(self):
+        return self.sheetNAME

@@ -1,10 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    {% load static %}
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="{% static 'CSS/style.css' %}"
+      type="text/css"
+    />
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student</title>
   </head>
-  <body></body>
+  <body>
+    <header></header>
+    <main>
+      <div class="time-table">
+        <h4>Today's periods</h4>
+        <hr />
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Time</th>
+              <th scope="col">Teacher name</th>
+              <th scope="col">Subject</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for time, tch_sub in periods.items %}
+            <tr>
+              <td>{{ time }}</td>
+              <td>{{ tch_sub.teacher }}</td>
+              <td>{{ tch_sub.subject }}</td>
+              <td>
+                <a
+                  href="https://www.instagram.com/p/CQuupfbotmf/?utm_source=ig_web_copy_link"
+                >
+                  <button type="button" class="btn btn-primary">Join</button>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="announces">
+        <h4>Announcements</h4>
+        <hr />
+        <div class="row">
+          {% for title, date_desc in announces.items %}
+          <div class="column">
+            <div
+              class="card text-white bg-success mb-3"
+              style="max-width: 18rem"
+            >
+              <div class="card-header">{{ date_desc.date }}</div>
+              <div class="card-body">
+                <h5 class="card-title">{{ title }}</h5>
+                <p class="card-text">{{ date_desc.description }}</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </main>
+    <footer class="footer">
+      <div class="container bottom_border">
+        <div class="row">
+          <div class="col-sm-4 col-md col-sm-4 col-12 col">
+            <h5 class="headin5_amrc col_white_amrc pt2">About us</h5>
+            <p class="mb10">
+              CODECOL Founded in 2019 by Tushar Parikh. When Tushar Parikh first
+              started out, his passion for Coding drove him to a small startup,
+              and gave him the impetus to turn to hard work.<br />We hope you
+              enjoy our products as much as we enjoy offering them to you. If
+              you have any questions please don't hesitate to contact us.<br />Sincerely,<br />Tushar,
+              [Founder]<br />Mayur, [CEO]
+            </p>
+          </div>
+          <div class="col-sm-4 col-md col-6 col">
+            <h5 class="headin5_amrc col_white_amrc pt2">Contact us</h5>
+            <ul class="footer_ul_amrc">
+              <li>
+                <p><i class="fa fa-phone"></i> +91-9016893446</p>
+              </li>
+              <li>
+                <p><i class="fa fa-phone"></i> +91-9537739131</p>
+              </li>
+              <li>
+                <p>
+                  <i class="fa fa fa-envelope"></i
+                  >codecol.entrepreneurs@gmail.com
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="col-sm-4 col-md col-6 col">
+            <h5 class="headin5_amrc col_white_amrc pt2">Donation</h5>
+            <ul class="footer_ul_amrc">
+              <li>
+                <img src="{% static 'Images/visa-card.png' %}" />
+                <img src="{% static 'Images/master-card.png' %}" />
+                <img src="{% static 'Images/debit-card.png' %}" />
+              </li>
+              <li><a href="http://webenlance.com">Donate</a></li>
+            </ul>
+          </div>
+          <div class="col-sm-4 col-md col-12 col">
+            <h5 class="headin5_amrc col_white_amrc pt2">Follow us</h5>
+            <ul class="footer_ul2_amrc">
+              <li>
+                <p>CODECOL</p>
+                <a href="https://www.instagram.com/entr.codecol"
+                  ><img src="{% static 'Images/instagram.png' %}"
+                /></a>
+                <img src="{% static 'Images/twitter.png' %}" />
+              </li>
+              <li>
+                <p>Founder</p>
+                <img src="{% static 'Images/instagram.png' %}" />
+                <img src="{% static 'Images/twitter.png' %}" />
+                <img src="{% static 'Images/linkedin.png' %}" />
+                <img src="{% static 'Images/github.png' %}" />
+              </li>
+              <li>
+                <p>CEO</p>
+                <a href="https://www.instagram.com/proh_gram_er"
+                  ><img src="{% static 'Images/instagram.png' %}"
+                /></a>
+                <a href="https://mobile.twitter.com/MayurTh85795476"
+                  ><img src="{% static 'Images/twitter.png' %}"
+                /></a>
+                <a href="https://www.linkedin.com/in/mayur-thakar-9747231a1"
+                  ><img src="{% static 'Images/linkedin.png' %}"
+                /></a>
+                <a href="https://github.com/MayurThakar"
+                  ><img src="{% static 'Images/github.png' %}"
+                /></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container">
+        <p class="text-center">
+          Copyright 8, 2019 -
+          <script>
+            new Date().getFullYear() > document.write(new Date().getFullYear());
+          </script>
+          | Designed With by
+          <a href="http://www.codecol.com/"
+            ><span style="color: #99e265">C</span
+            ><span style="color: #ffbd4a">O</span
+            ><span style="color: #ff5c5c">D</span
+            ><span style="color: #2eb2ff">E</span
+            ><span style="color: #99e265">C</span
+            ><span style="color: #ffbd4a">O</span
+            ><span style="color: #ff5c5c">L</span></a
+          >
+        </p>
+      </div>
+    </footer>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+      integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT"
+      crossorigin="anonymous"
+    ></script>
+  </body>
 </html>
