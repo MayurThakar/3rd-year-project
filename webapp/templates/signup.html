@@ -20,7 +20,7 @@
   </head>
   <body>
     <main class="container-main">
-      <div class="container">
+      <div class="container-form">
         <form action="{% url 'signup' %}" method="POST">
           {% csrf_token %} {% if not otp_verif %}
           <div class="form">
