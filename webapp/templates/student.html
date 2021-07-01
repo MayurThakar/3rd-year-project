@@ -110,7 +110,15 @@
                 <img src="{% static 'Images/master-card.png' %}" />
                 <img src="{% static 'Images/debit-card.png' %}" />
               </li>
-              <li><a href="http://webenlance.com">Donate</a></li>
+              <li>
+                <form>
+                  <script
+                    src="https://checkout.razorpay.com/v1/payment-button.js"
+                    data-payment_button_id="pl_HTahvJeb1Hy6d6"
+                    async
+                  ></script>
+                </form>
+              </li>
             </ul>
           </div>
           <div class="col-sm-4 col-md col-12 col">
