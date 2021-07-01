@@ -5,12 +5,6 @@ from django.shortcuts import render
 
 
 def index(request):
-    reference = main.Main(request)
-    periods = reference.fetch_periods()
-    announces = reference.fetch_announces()
-    return render(request, 'student.html', {
-        'periods': periods,
-        'announces': announces})
 
     if request.method == 'POST' and 'signin-button' in request.POST:
         reference = main.Main(request)
