@@ -12,10 +12,14 @@ def index(request):
         if (error := reference.isexist()) == True:
 
             if request.POST['account'] == 'faculty':
-                return render(request, 'faculty.html')
+                period = reference.has_periods(request.POST['username'])
+                announces = reference.fetch_announces()
+                return render(request, 'faculty.html', {
+                    'period': period,
+                    'announces': announces})
 
             else:
-                periods = reference.fetch_periods()
+                periods = reference.has_periods()
                 announces = reference.fetch_announces()
                 return render(request, 'student.html', {
                     'periods': periods,
@@ -31,6 +35,7 @@ def index(request):
 
 
 def signup(request):
+
     if request.method == 'POST' and 'signup-button' in request.POST:
         reference = main.Main(request)
 

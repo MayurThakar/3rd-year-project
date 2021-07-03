@@ -16,7 +16,7 @@ def isdeliverable(mail_addr):
     #     f'https://emailvalidation.abstractapi.com/v1/?api_key={api.key}&email={mail_addr}')
 
     # if (response.status_code != 200):
-    #     return f'[{response.status_code}]: please contact HOD', 0
+    #     return f'[{response.status_code}]: Please contact principal', 0
 
     # data = json.loads(response.text)
     # if data['deliverability'] == 'UNDELIVERABLE':
@@ -31,14 +31,14 @@ def isduplicate(new_data):
 
     for mdl in model:
 
-        fetched_username = mdl.objects.filter(
+        uname = mdl.objects.filter(
             username=new_data['new_username']).first()
-        if fetched_username:
+        if uname:
             return 'This username is already taken', 3
 
-        fetched_mail = mdl.objects.filter(
+        mail_addr = mdl.objects.filter(
             mail=new_data['mail']).first()
-        if fetched_mail:
+        if mail_addr:
             return 'This email is already taken', 4
 
     return isdeliverable(new_data['mail'])
@@ -73,13 +73,13 @@ def add_otp(mail_addr, genr_otp):
 
 def send_otp(data):
     mail_addr = data['mail']
-    name = data['first_name']
+    fname = data['first_name']
     account = data['new_account']
     api = apis.Mailjet()
     genr_otp = generate_otp()
-    mail = Client(auth=(api.key, api.secret), version='v3.1')
+    creds = Client(auth=(api.key, api.secret), version='v3.1')
 
-    data = {
+    body = {
         'Messages': [{
 
             "From": {
@@ -88,20 +88,23 @@ def send_otp(data):
 
             "To": [{
                 "Email": mail_addr,
-                "Name": name}],
+                "Name": fname}],
 
             "Subject": "Your verification code",
             "TextPart": "OTP verification",
             "HTMLPart":
-            f"<div style='font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;'><h3>Hi {name}!</h3>We just need to<span style='color: #99e265'> verify </span>your email address<br />before you can<span style='color: #ffbd4a'> access </span>{account} account.<br /><br />Your verification code is<span style='color: #ff5c5c'> {genr_otp}</span><br /><br />Enter this code in our website to<span style='color: #2eb2ff'> activate </span><br />your {account} account.<br /><br />Kind Regards, <br /><span style='color: #99e265'>C</span><span style='color: #ffbd4a'>O</span><span style='color: #ff5c5c'>D</span><span style='color: #2eb2ff'>E</span><span style='color: #99e265'>C</span><span style='color: #ffbd4a'>O</span><span style='color: #ff5c5c'>L</span></div>",
+            f"<div style='font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;'><h3>Hi {fname}!</h3>We just need to<span style='color: #99e265'> verify </span>your email address<br />before you can<span style='color: #ffbd4a'> access </span>{account} account.<br /><br />Your verification code is<span style='color: #ff5c5c'> {genr_otp}</span><br /><br />Enter this code in our website to<span style='color: #2eb2ff'> activate </span><br />your {account} account.<br /><br />Kind Regards, <br /><span style='color: #99e265'>C</span><span style='color: #ffbd4a'>O</span><span style='color: #ff5c5c'>D</span><span style='color: #2eb2ff'>E</span><span style='color: #99e265'>C</span><span style='color: #ffbd4a'>O</span><span style='color: #ff5c5c'>L</span></div>",
             "CustomID": "AppGettingStartedTest"}]
     }
 
-    # response = mail.send.create(data=data)
+    # response = creds.send.create(data=body)
     # if (response.status_code != 200):
-    #     return f'[{response.status_code}]: please contact HOD'
+    #     return f'[{response.status_code}]: Please contact principal'
 
-    add_otp(mail_addr, genr_otp)
+    otp = models.OTP.objects.filter(mail=mail_addr).first()
+    if otp == None:
+        add_otp(mail_addr, genr_otp)
+
     return True
 
 
@@ -123,7 +126,7 @@ def account_status(username):
     acct_sts = models.Faculty.objects.filter(username=username).first()
 
     if acct_sts.account_status == 'pending':
-        return 'Your account is not active, please contact HOD', 0
+        return 'Your account is not active, Please contact principal', 0
     elif acct_sts.account_status == 'deactive':
         return 'Sorry, your account been deactivated', 0
 
@@ -135,10 +138,53 @@ def get_credentials():
     return id_name.sheetID, id_name.sheetNAME
 
 
+def read_Gsheet():
+    SPREADSHEET_ID, SPREADSHEET_NAME = get_credentials()
+    creds = credentials.Credentials(SPREADSHEET_ID, SPREADSHEET_NAME)
+    dataframe = panda.read_csv(creds.SPREADSHEET_URL)
+    sheet = dataframe.loc[:, ~dataframe.columns.str.contains('^Unnamed')]
+    return sheet
+
+
 def get_current_day():
     response = requests.get('http://worldclockapi.com/api/json/gmt/now')
     data = json.loads(response.text)
     return data['dayOfTheWeek']
+
+
+def column_in(sheet, day):
+    if not day in sheet.columns:
+        return False
+
+    return True
+
+
+def get_full_name(username):
+    uname = models.Faculty.objects.filter(username=username).first()
+    return uname.full_name
+
+
+def fetch_periods(sheet, day):
+    cols = panda.DataFrame(sheet, columns=[day, 'Time'])
+    periods = {}
+
+    for _, row in cols.iterrows():
+        if len(str(row[day]).split('|')) > 1:
+            periods[row['Time']] = {
+                'username': str(row[day]).split('|')[0],
+                'teacher': get_full_name(str(row[day]).split('|')[0]),
+                'subject': str(row[day]).split('|')[1].title()}
+
+    return periods
+
+
+def user_period(username, periods):
+
+    for time, tch_sub in periods.items():
+        if username == tch_sub['username']:
+            return [time, tch_sub['subject']]
+
+    return None
 
 
 def get_current_time():
@@ -164,11 +210,11 @@ class Main:
         else:
             model = models.Student
 
-        fetched_uname = model.objects.filter(username=username).first()
+        uname = model.objects.filter(username=username).first()
 
-        if not fetched_uname:
+        if uname == None:
             return 'User does not exist', 1
-        elif fetched_uname.password != password:
+        elif uname.password != password:
             return 'Incorrect password', 2
 
         return account_status(username) if self.request.POST['account'] == 'faculty' else True
@@ -197,7 +243,7 @@ class Main:
         obtd_otp = self.request.POST['otp']
         mail_addr = self.request.session['data']['mail']
 
-        if not obtd_otp.isdigit():
+        if obtd_otp.isdigit() == False:
             return 'Please provide only digits'
 
         otp_mail = models.OTP.objects.filter(
@@ -224,31 +270,27 @@ class Main:
         reference.password = encrypt_password(data['new_password'])
         reference.save()
 
-    def fetch_periods(self):
-        SPREADSHEET_ID, SPREADSHEET_NAME = get_credentials()
+    def has_periods(self, username=None):
+        sheet = read_Gsheet()
         DAY = get_current_day()
 
-        creds = credentials.Credentials(SPREADSHEET_ID, SPREADSHEET_NAME)
-        dataframe = panda.read_csv(creds.SPREADSHEET_URL)
-        clean_data = dataframe.loc[:, ~
-                                   dataframe.columns.str.contains('^Unnamed')]
-        data = panda.DataFrame(clean_data, columns=[DAY, 'Time'])
-        periods = {}
+        if column_in(sheet, DAY):
+            periods = fetch_periods(sheet, DAY)
 
-        for _, row in data.iterrows():
-            if len(str(row[DAY]).split('|')) > 1:
-                periods[row['Time']] = {
-                    'teacher': str(row[DAY]).split('|')[0],
-                    'subject': str(row[DAY]).split('|')[1].title()}
+            if username != None:
+                return user_period(username, periods)
 
-        return periods
+            return periods
+
+        else:
+            return None
 
     def fetch_announces(self):
-        fetched_announces = list(
+        announcements = list(
             set(models.Announce.objects.all().values_list()))
         announces = {}
 
-        for content in fetched_announces:
+        for content in announcements:
             announces[content[2].title()] = {
                 'date': content[1],
                 'description': content[3]}

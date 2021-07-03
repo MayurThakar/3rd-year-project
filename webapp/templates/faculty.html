@@ -21,6 +21,7 @@
   <body>
     <header></header>
     <main>
+      {% if period %}
       <div class="container-main">
         <div class="block" id="post-link">
           <h5>Gujarati period at 10:00:00</h5>
@@ -43,6 +44,7 @@
           <p>Link: <a href="{{ posted_link }}"></a></p>
         </div>
       </div>
+      {% endif %}
       <div class="announces">
         <h4>Announcements</h4>
         <hr />

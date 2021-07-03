@@ -21,7 +21,8 @@
   <body>
     <header></header>
     <main>
-      <div class="time-table">
+      {% if periods %}
+      <div class="block">
         <h4>Today's periods</h4>
         <hr />
         <table class="table table-hover">
@@ -50,6 +51,7 @@
           </tbody>
         </table>
       </div>
+      {% endif %}
       <div class="announces">
         <h4>Announcements</h4>
         <hr />
