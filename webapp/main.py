@@ -10,17 +10,15 @@ from datetime import datetime, timedelta
 
 
 def isdeliverable(mail_addr):
-    # api = apis.Abstract()
+    api = apis.Abstract()
+    response = requests.get(f'https://emailvalidation.abstractapi.com/v1/?api_key={api.key}&email={mail_addr}')
+    
+    if (response.status_code != 200):
+        return f'[{response.status_code}]: Please contact principal', 0
 
-    # response = requests.get(
-    #     f'https://emailvalidation.abstractapi.com/v1/?api_key={api.key}&email={mail_addr}')
-
-    # if (response.status_code != 200):
-    #     return f'[{response.status_code}]: Please contact principal', 0
-
-    # data = json.loads(response.text)
-    # if data['deliverability'] == 'UNDELIVERABLE':
-    #     return 'Email is undeliverable, please change!', 4
+    data = json.loads(response.text)
+    if data['deliverability'] == 'UNDELIVERABLE':
+        return 'Email is undeliverable, please change!', 4
 
     return True
 
@@ -97,9 +95,9 @@ def send_otp(data):
             "CustomID": "AppGettingStartedTest"}]
     }
 
-    # response = creds.send.create(data=body)
-    # if (response.status_code != 200):
-    #     return f'[{response.status_code}]: Please contact principal'
+    response = creds.send.create(data=body)
+    if (response.status_code != 200):
+        return f'[{response.status_code}]: Please contact principal'
 
     otp = models.OTP.objects.filter(mail=mail_addr).first()
     if otp == None:
